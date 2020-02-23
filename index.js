@@ -1,8 +1,11 @@
+const { getAbsoluteURL } = require("./getAbsoluteURL")
+
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 5000
 const db = require('./dbConfig')
 const roomsRouter = require('./Routers/roomsRouter')
+const infoRouter = require('./Routers/infoRouter')
 const routes = require('./routes')
 
 
@@ -15,18 +18,20 @@ app.use(function (req, res, next) {
 
 app.all('*', function(req, res, next){
     console.log("API entry point")
-
     next();
 })
 
 app.use(routes.rooms, roomsRouter);
-
+app.use("/info", infoRouter)
 
 app.get("/", function(req, res, next){
     var response  = {
         href : getAbsoluteURL(req),
         rooms : {
             href : `${getAbsoluteURL(req)}rooms${routes.getRooms}`
+        },
+        info : {
+            href : `${getAbsoluteURL(req)}info/`
         }
     }
 
@@ -53,6 +58,4 @@ app.listen(port, function(){
 
 
 
-function getAbsoluteURL(req){
-    return req.protocol + '://' + req.get('host') + req.originalUrl;
-}
+
