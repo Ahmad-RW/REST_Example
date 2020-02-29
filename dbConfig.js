@@ -118,4 +118,7 @@ ballRooms.insert({
 
 })
 
-module.exports = db;
+module.exports = {
+    rooms,
+    ballRooms
+};

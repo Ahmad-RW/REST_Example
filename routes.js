@@ -1,6 +1,7 @@
 const routes = {
     rooms : "/rooms",
-    getRooms : "/getRooms"
+    getRooms : "/getRooms",
+    getRoomById : "/:roomId"
 
 }
 

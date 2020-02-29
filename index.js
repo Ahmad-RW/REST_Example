@@ -7,7 +7,7 @@ const db = require('./dbConfig')
 const roomsRouter = require('./Routers/roomsRouter')
 const infoRouter = require('./Routers/infoRouter')
 const routes = require('./routes')
-
+const xml = require('jsontoxml')
 
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -17,6 +17,7 @@ app.use(function (req, res, next) {
 });
 
 app.all('*', function(req, res, next){
+    console.log( req.get("Accept"))
     console.log("API entry point")
     next();
 })
@@ -40,12 +41,23 @@ app.get("/", function(req, res, next){
 
 app.all('*', function(req, res, next){
     console.log("API exit point")
-
+    
     //handles exception that occured internally in the server. customize internal error message based on env.
     if(res.statusCode >=500){
         console.log(res.locals)
         res.send(res.locals)
+        return
     }
+    let response = res.locals
+
+
+    if(req.get("Accept") === "application/xml"){
+        res.set("Content-Type", "application/xml")
+        response = xml(JSON.stringify(response))
+    }
+    res.send(response)
+    
+
     
 })
 
