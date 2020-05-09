@@ -13,11 +13,11 @@ app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
-    
+
 });
 
-app.all('*', function(req, res, next){
-    console.log( req.get("Accept"))
+app.all('*', function (req, res, next) {
+    console.log(req.get("Accept"))
     console.log("API entry point")
     next();
 })
@@ -25,46 +25,100 @@ app.all('*', function(req, res, next){
 app.use(routes.rooms, roomsRouter);
 app.use("/info", infoRouter)
 
-app.get("/", function(req, res, next){
-    var response  = {
-        href : getAbsoluteURL(req),
-        rooms : {
-            href : `${getAbsoluteURL(req)}rooms${routes.getRooms}`
+app.get("/", function (req, res, next) {
+    var response = {
+        self: {
+            href: getAbsoluteURL(req),
         },
-        info : {
-            href : `${getAbsoluteURL(req)}info/`
+        rooms: {
+            href: `${getAbsoluteURL(req)}rooms${routes.getRooms}`
+        },
+        info: {
+            href: `${getAbsoluteURL(req)}info/`
         }
     }
 
-    res.status(200).send(response)
+    res.status(200)
+    res.locals.response = response
+    next()
 })
 
-app.all('*', function(req, res, next){
+app.all('*', function (req, res, next) {
     console.log("API exit point")
-    
+
     //handles exception that occured internally in the server. customize internal error message based on env.
-    if(res.statusCode >=500){
+    if (res.statusCode >= 500) {
         console.log(res.locals)
         res.send(res.locals)
         return
     }
-    let response = res.locals
+    let response = res.locals.response
+
+    if (response !== undefined || response !== null) {
+        for (let [key, value] of Object.entries(response)) {
+
+            if (key === "href") {
+                const rel = response[key].rel
+                // response[key] = {
+                //     href : value,
+                //     method : req.method,
+                //     rel : [`${rel}`]
+                // }
+                // response[key].setHref(value.href)
+                // response[key].setRel([value.rel])
+                // response[key].setMethod(req.method)
+
+            }
+            if (key === "self") {
+                console.log("unwrapping self link")
+                response = {
+                    href: response[key].href,
+                    rel: response[key].rel,
+                    method: req.method,
+                    ...response
+                }
+                delete response.self
+            }
+            // if(key === "value" && typeof Array.isArray(value)){
+            //     value.forEach(element => {
+            //         for(let [key, value] of Object.entries(element)){
+            //             if(key === "href"){
+            //                 const rel = element[key].rel
+            //                 element[key] = {
+            //                     href : value,
+            //                     method : req.method,
+            //                     rel : [`${rel}`]
+            //                 }
+            //                 // element[key].setHref(value.href)
+            //                 // element[key].setRel([rel])
+            //                 // element[key].setMethod(req.method)
+            //             }
+            //         }
+            //     });
+            //}
+
+            
+
+        }
+    }
 
 
-    if(req.get("Accept") === "application/xml"){
+    if (req.get("Accept") === "application/xml") {
         res.set("Content-Type", "application/xml")
         response = xml(JSON.stringify(response))
     }
-    res.send(response)
-    
 
-    
+
+    res.send(response)
+
+
+
 })
 
 
 
 
-app.listen(port, function(){
+app.listen(port, function () {
     console.log(`listening on port ${port}`)
 })
 

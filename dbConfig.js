@@ -10,84 +10,97 @@ rooms.insert({
     number : "1",
     size : "small",
     floor : "1",
-    executive : false
+    executive : false,
+    available : true
 }
 )
 rooms.insert({
     number : "2",
     size : "small",
     floor : "1",
-    executive : false
+    executive : false,
+    available : true
 }
 )
 rooms.insert({
     number : "3",
     size : "small",
     floor : "1",
-    executive : false
+    executive : false,
+    available : true
 }
 )
 rooms.insert({
     number : "4",
     size : "small",
     floor : "1",
-    executive : false
+    executive : false,
+    available : true
 }
 )
 rooms.insert({
     number : "5",
     size : "medium",
     floor : "1",
-    executive : false
+    executive : false,
+    available : true
+
 }
 )
 rooms.insert({
     number : "6",
     size : "medium",
     floor : "1",
-    executive : false
+    executive : false,
+    available : true
 }
 )
 rooms.insert({
     number : "7",
     size : "large",
     floor : "1",
-    executive : false
+    executive : false,
+    available : true
 }
 )
 rooms.insert({
     number : "8",
     size : "small",
     floor : "1",
-    executive : true
+    executive : true,
+    available : true
 }
 )
 rooms.insert({
     number : "9",
     size : "small",
     floor : "1",
-    executive : true
+    executive : true,
+    available : true
 }
 )
 rooms.insert({
     number : "10",
     size : "large",
     floor : "1",
-    executive : false
+    executive : false,
+    available : true
 }
 )
 rooms.insert({
     number : "11",
     size : "large",
     floor : "1",
-    executive : false
+    executive : false,
+    available : true
 }
 )
 rooms.insert({
     number : "12",
     size : "large",
     floor : "1",
-    executive : true
+    executive : true,
+    available : true
 }
 )
 

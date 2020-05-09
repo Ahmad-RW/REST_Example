@@ -7,6 +7,7 @@
     "express": "^4.17.1",
     "jsontoxml": "^1.0.1",
     "lokijs": "^1.5.8",
+    "moment": "^2.25.3",
     "mongodb": "^3.5.1",
     "mongoose": "^5.8.9",
     "xml": "^1.0.1"
