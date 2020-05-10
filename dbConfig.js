@@ -7,80 +7,88 @@ const ballRooms = db.addCollection("ballRooms")
 console.log("populating database now")
 //populate rooms start
 rooms.insert({
-    number : "1",
+    number : 1,
     size : "small",
-    floor : "1",
+    floor : 1,
     executive : false,
     available : true
 }
 )
 rooms.insert({
-    number : "2",
+    number : 2,
     size : "small",
-    floor : "1",
+    floor : 1,
     executive : false,
     available : true
 }
 )
 rooms.insert({
-    number : "3",
+    number : 3,
     size : "small",
-    floor : "1",
+    floor : 1,
     executive : false,
     available : true
 }
 )
 rooms.insert({
-    number : "4",
+    number : 4,
     size : "small",
-    floor : "1",
+    floor : 1,
     executive : false,
     available : true
 }
 )
 rooms.insert({
-    number : "5",
+    number : 5,
     size : "medium",
-    floor : "1",
+    floor : 1,
     executive : false,
     available : true
 
 }
 )
 rooms.insert({
-    number : "6",
+    number : 6,
     size : "medium",
-    floor : "1",
+    floor : 1,
     executive : false,
     available : true
 }
 )
 rooms.insert({
-    number : "7",
+    number : 7,
     size : "large",
-    floor : "1",
+    floor : 1,
     executive : false,
     available : true
 }
 )
 rooms.insert({
-    number : "8",
+    number : 8,
     size : "small",
-    floor : "1",
+    floor : 1,
     executive : true,
     available : true
 }
 )
 rooms.insert({
-    number : "9",
+    number : 9,
     size : "small",
-    floor : "1",
+    floor : 1,
     executive : true,
     available : true
 }
 )
 rooms.insert({
-    number : "10",
+    number : 10,
+    size : "large",
+    floor : 1,
+    executive : false,
+    available : true
+}
+)
+rooms.insert({
+    number : 11,
     size : "large",
     floor : "1",
     executive : false,
@@ -88,17 +96,9 @@ rooms.insert({
 }
 )
 rooms.insert({
-    number : "11",
+    number : 12,
     size : "large",
-    floor : "1",
-    executive : false,
-    available : true
-}
-)
-rooms.insert({
-    number : "12",
-    size : "large",
-    floor : "1",
+    floor : 1,
     executive : true,
     available : true
 }

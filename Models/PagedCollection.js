@@ -7,55 +7,60 @@
 */
 
 const Collection = require('../Resources/Collection')
-class PagedCollection extends Collection{
+class PagedCollection extends Collection {
     offset
-    size 
+    size
     limit
     first
     next
     prev
     last
-    constructor( offset, size, limit, value, href, rel ){
-         super(value, href, rel)
-         this.offset = offset
-         this.size = size
-         this.limit = limit
-         this.next = offset*2
-         this.prev = offset == 0 ? 0 : parseInt(offset/2)
+    constructor(offset, size, limit, value, href, rel, sortQuery, filterQuery, sortCriteria) {
+        super(value, href, rel, sortQuery, filterQuery, sortCriteria)
+        this.offset = offset
+        this.size = size
+        this.limit = limit
+        this.next = offset * 2
+        this.prev = offset == 0 ? 0 : parseInt(offset / 2)
 
-         //validation 
-         this.prev < 0 ? this.prev = 0 : this.prev
-         this.prev > this.size ? this.prev = this.offset - 5 : this.prev
+        //validation 
+        this.prev < 0 ? this.prev = 0 : this.prev
+        this.prev > this.size ? this.prev = this.offset - 5 : this.prev
 
-         //validation
-         this.next > this.size ? this.next = 0 : this.next
+        //validation
+        this.next > this.size ? this.next = 0 : this.next
     }
 
-    applyPagination(){
+    applyPagination() {
         console.log("applying pagination")
+        //sort, filter collection before pagination
+        if (this.sortCriteria.length !== 0) {
+            this.sortCollection()
+            this.filterCollection()
+        }
+        //keep shifting until the value[0] is the offset the client eants the collection (value) to start at
+        for (let i = 1; i < this.offset; i++) {
+            //don't pop is limit > length. if client requests offset out of bound, break from shifting
+            if (this.offset > this.size) {
+                break
+            }
+            this.value.shift()
 
-       //keep shifting until the value[0] is the offset the client eants the collection (value) to start at
-       for (let i = 1; i < this.offset ; i++) {
-        //don't pop is limit > length. if client requests offset out of bound, break from shifting
-        if(this.offset > this.size) break
-        console.log("shifting array")
-        this.value.shift()
-     
+        }
+
+        // keep popping until the lengtth of the collection (value) = to the limit the client wants
+        for (let i = 0; this.limit < this.value.length; i++) {
+            //don't pop is limit > length. if client request limit grater than size of collection just return the whole thing.
+            if (this.limit > this.size) {
+                break
+            }
+            this.value.pop()
+        }
+
+        return this
     }
 
-       // keep popping until the lengtth of the collection (value) = to the limit the client wants
-       for (let i = 0; this.limit < this.value.length ; i++) {
-           //don't pop is limit > length. if client request limit grater than size of collection just return the whole thing.
-           if(this.limit > this.size) break
-           console.log("popping array")
-           this.value.pop()
-        
-       }
-       
-        return this
-   }
 
-   
 
 }
 

@@ -18,20 +18,29 @@ roomsRouter.get('/',function(req, res, next){
     
     const offset = parseInt(req.query.offset) || 0
     const limit  = parseInt(req.query.limit) || 5
-
+    const sortQuery = req.query.sortQuery
+    const filterQuery = req.query.filterQuery 
+    console.log(filterQuery)
     let result = roomService.getAllRooms()
     const roomsArray = []
     result.forEach(value =>{
-        const room = new Room(value.number, value.size, value.floor, value.executive, `${getAbsoluteURL(req)}room/${value.number}`)
+        const room = new Room(value.number, value.size, value.floor, value.executive, `${req.protocol}://${req.hostname}:5000/rooms/room/${value.number}`)
        
         roomsArray.push(room)
     })
 
 
-    //const roomCollection = new Collection(roomsArray, getAbsoluteURL(req), "collection")
-
-
-    const roomCollection = new PagedCollection(offset, roomsArray.length , limit, roomsArray, `${req.protocol}://${req.hostname}:5000/rooms/`, "collection" ).applyPagination().getResponse()
+    let roomCollection;
+    try {
+     roomCollection = new PagedCollection(offset, roomsArray.length , limit, roomsArray, `${req.protocol}://${req.hostname}:5000/rooms/`, "collection", sortQuery, filterQuery, ["roomId", "size"]).applyPagination().getResponse()
+        
+    } catch (error) {
+        console.log(error)
+        res.status(error.code)
+        res.locals = error.msg
+        next()
+        return
+    }
     res.status(200)
     //internally save the response and then send it at the last middleware(check index.js)
     res.locals.response = roomCollection
@@ -69,7 +78,7 @@ roomsRouter.get('/openings', function(req, res, next){
    
     const offset = parseInt(req.query.offset) || 0
     const limit  = parseInt(req.query.limit) || 5
-
+    const sortQuery = req.query.sortQuery
     const rooms = roomService.getAllRooms().sort(function(firstElem, secondElem){
         if(firstElem.$loki < secondElem.$loki) return -1
         
@@ -83,9 +92,22 @@ roomsRouter.get('/openings', function(req, res, next){
         if(value.available) openings.push(new RoomOpenings({href : `${req.protocol}://${req.hostname}:5000/rooms/room/${value.number}`}, moment(), moment().add(2, 'days'), Math.floor(Math.random() *200) + 100  )) 
     })
     
+    let response
+    try {
+        response = new PagedCollection(offset, openings.length , limit, openings, `${req.protocol}://${req.hostname}:5000/rooms/openings`, "collection", sortQuery, ["rate"]  ).applyPagination().getResponse()
+
+
+    } catch (error) {
+       console.log(error)
+       res.locals = error
+       res.status(500)
+       next()
+       return 
+    }
+
     res.status(200)
     //internally save the response and then send it at the last middleware(check index.js)
-    res.locals.response = new PagedCollection(offset, openings.length , limit, openings, `${req.protocol}://${req.hostname}:5000/rooms/openings`, "collection" ).applyPagination().getResponse()
+    res.locals.response = response
 
      next()
 

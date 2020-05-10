@@ -47,7 +47,7 @@ app.all('*', function (req, res, next) {
     console.log("API exit point")
 
     //handles exception that occured internally in the server. customize internal error message based on env.
-    if (res.statusCode >= 500) {
+    if (res.statusCode >= 400) {
         console.log(res.locals)
         res.send(res.locals)
         return
