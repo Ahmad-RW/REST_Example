@@ -4,15 +4,16 @@ class Collection {
     href
     ref
     sortQuery
-    sortCriteria
+    criteria // sort criteria are allowed fields to sort/filter by
     filterQuery
+    allowedOps = ['lt', 'lte', 'gt', 'gte', 'eq', '!eq']
     constructor(value, href, rel, sortQuery, filterQuery, sortCriteria ) {
 
         this.value = value
         this.href = href
         this.rel = rel
         this.sortQuery = sortQuery
-        this.sortCriteria = sortCriteria
+        this.criteria = sortCriteria
         this.filterQuery = filterQuery
     }
 
@@ -21,10 +22,10 @@ class Collection {
         console.log("sorting collection")
 
         //handle if client tries to sort unquerable endpoint
-        if (this.sortCriteria.length === 0 && this.sortQuery !== undefined) {
+        if (this.criteria.length === 0 && this.sortQuery !== undefined) {
             throw { msg: 'unquerable endpoint', code: 400 }
         }
-        if (this.sortCriteria.length === 0) {
+        if (this.criteria.length === 0) {
             console.log("no sort criteria for this collection. exiting sortCollection")
             return
         }
@@ -44,7 +45,7 @@ class Collection {
 
 
         //test if field exists in collection or not
-        if (!this.sortCriteria.includes(field)) {
+        if (!this.criteria.includes(field)) {
             throw { msg: 'invalid sort syntax', code: 400 }
         }
 
@@ -76,45 +77,89 @@ class Collection {
     }
 
     filterCollection() {
+        //it won't get called if below statement is true however just as a fallback I added it.
         if (this.filterQuery === undefined || this.filterQuery === null) {
             console.log("sort query failed sanity check")
             return
         }
-        //handle if client tries to filter unquerable endpoint
-        if (this.sortCriteria.length === 0 && this.filterQuery !== undefined) {
+
+        //handle if client tries to filter unquerable endpoint. An endpoint is defined queryable if sortCriteria is populated at instance creation in the endpoint
+        if (this.criteria.length === 0 && this.filterQuery !== undefined) {
             throw { msg: 'unquerable endpoint', code: 400 }
         }
-        if (this.sortCriteria.length === 0) {
-            console.log("no sort criteria for this collection. exiting sortCollection")
+
+        if (this.criteria.length === 0) {
+            console.log("no sort/filter criteria for this collection. exiting filterCollection")
             return
         }
-        console.log(this.filterQuery)
-        const tokens = this.filterQuery.split(' ')
-        const field = tokens[0]
-        const filterValue = tokens[1]            
-        console.log(filterValue)
 
-        //handle if client tries to filter unquerable endpoint
-        if (this.sortCriteria.length === 0 && this.filterQuery !== undefined) {
-            throw { msg: 'unquerable endpoint', code: 400 }
+        
+    
+        //tokenzing filter query. 
+        const tokens = this.filterQuery.split(' ')
+        
+        //if includes spaces return syntax error. ideally we can handle this and not cause an overhead for the client but I was lazy so...
+        if(tokens.includes(' ')){
+            console.log("syntax error. token includes an extra space")
+            throw { msg: 'syntax error. extra spaces', code: 400 }
         }
-        if (tokens.length != 2) {
+
+        //I decided to be strict in terms of checking the filter and sort queries to avoid loop holes.
+        if (tokens.length != 3) {
             throw { msg: 'invalid filter syntax', code: 400 }
 
         }
 
+        // getting individual tokens after parsing
+        const field = tokens[0]
+        const operator = tokens[1] 
+        const rightSideValue = tokens[2]
+    
+      
+
+        //trying to filter by an unacceptable field
+        if (!this.criteria.includes(field)) {
+            throw { msg: 'invalid filter syntax', code: 400 }
+        }
+
+        //check if operator used is a valid one
+        if(!this.isOperatorValid(operator)){
+            console.log("invalid operator")
+            throw {msg : `invalid operator. allowed operators are ${this.allowedOps.reduce((accum, curr)=>{ return accum.concat(","+curr)})}`, code : 400}
+        }
+        
+        
         this.value = this.value.filter(function (value) {
 
-            return value[field] != filterValue
+            switch(operator){
+                case 'lt':
+                    return value[field] < rightSideValue
+
+                case 'lte':
+                    return value[field] <= rightSideValue
+
+                case 'gt':
+                    return value[field] > rightSideValue
+
+                case 'gte':
+                    return value[field] >= rightSideValue                    
+
+                case 'eq':
+                    return value[field] == rightSideValue
+
+                case '!eq':
+                    return value[field] != rightSideValue
+
+                default:
+                    return true
+
+            }
+            return value[field] != rightSideValue
         })
     }
 
     getResponse() {
-        // if (this.sortCriteria.length !== 0) {
-        //     this.sortCollection()
-        //     this.filterCollection()
-        // }
-
+     
         let response = {
             self: {
                 href: this.href,
@@ -158,6 +203,10 @@ class Collection {
         }
 
         return response
+    }
+
+    isOperatorValid(operator){
+        return this.allowedOps.includes(operator)
     }
 
 }

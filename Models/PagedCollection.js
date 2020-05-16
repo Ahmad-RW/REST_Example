@@ -34,7 +34,7 @@ class PagedCollection extends Collection {
     applyPagination() {
         console.log("applying pagination")
         //sort, filter collection before pagination
-        if (this.sortCriteria.length !== 0) {
+        if (this.criteria.length !== 0) {
             this.sortCollection()
             this.filterCollection()
         }
