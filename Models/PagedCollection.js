@@ -15,8 +15,8 @@ class PagedCollection extends Collection {
     next
     prev
     last
-    constructor(offset, size, limit, value, href, rel, sortQuery, filterQuery, sortCriteria) {
-        super(value, href, rel, sortQuery, filterQuery, sortCriteria)
+    constructor(offset, size, limit, value, href, rel, sortQuery, filterQuery, criteria) {
+        super(value, href, rel, sortQuery, filterQuery, criteria)
         this.offset = offset
         this.size = size
         this.limit = limit

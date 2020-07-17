@@ -4,6 +4,8 @@ let db = new loki("inMemoryHotel")
 
 const rooms = db.addCollection("rooms")
 const ballRooms = db.addCollection("ballRooms")
+const config = db.addCollection("config")
+const bookings = db.addCollection("bookings")
 console.log("populating database now")
 //populate rooms start
 rooms.insert({
@@ -131,7 +133,26 @@ ballRooms.insert({
 
 })
 
+
+config.insert({
+    key : "MIN_STAY",
+    value : 172800000 //ms in days
+})
+
+config.insert({
+    key : "RATE",
+    value : 250 //ms in days
+})
+
+// bookings.insert({
+//     roomId : 1,
+//     startAt : "10/10/2010",
+//     endAt : "15/10/2010"
+// })
+
 module.exports = {
     rooms,
-    ballRooms
+    ballRooms,
+    config,
+    bookings
 };

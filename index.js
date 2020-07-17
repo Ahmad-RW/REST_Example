@@ -8,6 +8,10 @@ const roomsRouter = require('./Routers/roomsRouter')
 const infoRouter = require('./Routers/infoRouter')
 const routes = require('./routes')
 const xml = require('jsontoxml')
+const bodyParser = require('body-parser')
+const bookingsRouter = require("./Routers/bookingsRouter")
+
+app.use(bodyParser.json());// post request body parser
 
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -22,7 +26,8 @@ app.all('*', function (req, res, next) {
     next();
 })
 
-app.use(routes.rooms, roomsRouter);
+app.use("/rooms", roomsRouter);
+app.use("/bookings", bookingsRouter)
 app.use("/info", infoRouter)
 
 app.get("/", function (req, res, next) {
@@ -49,12 +54,13 @@ app.all('*', function (req, res, next) {
     //handles exception that occured internally in the server. customize internal error message based on env.
     if (res.statusCode >= 400) {
         console.log(res.locals)
-        res.send(res.locals)
+        res.send(res.locals.response)
         return
     }
     let response = res.locals.response
-
-    if (response !== undefined || response !== null) {
+   
+    if (response !== undefined && response !== null) {
+        console.log("in")
         for (let [key, value] of Object.entries(response)) {
 
             if (key === "href") {

@@ -7,13 +7,13 @@ class Collection {
     criteria // sort criteria are allowed fields to sort/filter by
     filterQuery
     allowedOps = ['lt', 'lte', 'gt', 'gte', 'eq', '!eq']
-    constructor(value, href, rel, sortQuery, filterQuery, sortCriteria ) {
+    constructor(value, href, rel, sortQuery, filterQuery, criteria ) {
 
         this.value = value
         this.href = href
         this.rel = rel
         this.sortQuery = sortQuery
-        this.criteria = sortCriteria
+        this.criteria = criteria
         this.filterQuery = filterQuery
     }
 
@@ -131,7 +131,7 @@ class Collection {
         
         this.value = this.value.filter(function (value) {
 
-            switch(operator){
+            switch(operator.toLowerCase()){
                 case 'lt':
                     return value[field] < rightSideValue
 
@@ -154,7 +154,7 @@ class Collection {
                     return true
 
             }
-            return value[field] != rightSideValue
+            
         })
     }
 

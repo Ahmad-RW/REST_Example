@@ -1,4 +1,4 @@
-const Resource = require('./Resource')
+
 class Room {
     roomId = ""
     size = ""
