@@ -57,14 +57,14 @@ bookingsRouter.delete("/:bookingId", function(req, res, next){
 
     
     if(!bookingService.bookingExists(bookingId)){
-        res.status(400)
+        res.status(404)
         res.locals.response = {msg : "booking for provided booking ID does not exist"}
         next()
         return
     }
 
     bookingService.deleteBooking(bookingId)
-    
+
     //query again to make sure if deleted.
     if(bookingService.bookingExists(bookingId)){
         res.status(500)
