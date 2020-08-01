@@ -12,7 +12,6 @@ const moment = require('moment')
 const PagedCollection = require('../Models/PagedCollection')
 const configServices = require('../Services/configService')
 const bookingService = require('../Services/bookingService')
-const { STATES } = require('mongoose')
 const Form = require('../Forms/Form')
 // GET rooms/{roomId}
 
@@ -29,32 +28,20 @@ roomsRouter.get('/',function(req, res, next){
     let result = roomService.getAllRooms()
     const roomsArray = []
     result.forEach(value =>{
-        const bookingForm = new Form(["create-form"], 
-        `${req.protocol}://${req.hostname}:5000/rooms/${value.number}/bookings`,
-        "POST",
-        [{
-            name : "startAt",
-            label : "Booking start time",
-            required : true,
-            type : "datetime"
-        },
-        {
-            name : "endAt",
-            label : "Booking end time",
-            required : true,
-            type : "datetime"
-        }])
-        const room = new Room(value.number, value.size, value.floor, value.executive, `${req.protocol}://${req.hostname}:5000/rooms/room/${value.number}`, bookingForm)
+     
+        const room = new Room(value.number, value.size, value.floor, value.executive, `${req.protocol}://${req.hostname}:5000/rooms/room/${value.number}`)
        
         roomsArray.push(room)
     })
-
+    console.log(filterQuery)
 
     let response;
     try {
-     response = new PagedCollection(offset, roomsArray.length , limit, roomsArray, `${req.protocol}://${req.hostname}:5000/rooms/`, "collection", sortQuery, filterQuery, ["roomId", "size"]).applyPagination().getResponse()
+     response = new PagedCollection(offset, roomsArray.length , limit, roomsArray, `${req.protocol}://${req.hostname}:5000/rooms/`,
+      "collection", sortQuery, filterQuery, ["roomId", "size", "executive"]).applyPagination().getResponse()
         
     } catch (error) {
+
         console.log(error)
         res.status(error.code)
         res.locals = error.msg
@@ -90,22 +77,7 @@ roomsRouter.get('/room/:roomId', function(req, res, next){
         res.status(404).send()
         return
     }
-    const bookingForm = new Form(["create-form"], 
-    `${req.protocol}://${req.hostname}:5000/rooms/${result.number}/bookings`,
-    "POST",
-    [{
-        name : "startAt",
-        label : "Booking start time",
-        required : true,
-        type : "datetime"
-    },
-    {
-        name : "endAt",
-        label : "Booking end time",
-        required : true,
-        type : "datetime"
-    }])
-    const roomResource = new Room(result.number, result.size, result.floor, result.executive, getAbsoluteURL(req), bookingForm)
+    const roomResource = new Room(result.number, result.size, result.floor, result.executive, getAbsoluteURL(req))
 
     console.log(typeof roomResource)
     res.status(200)

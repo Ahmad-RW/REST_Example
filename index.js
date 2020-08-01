@@ -10,6 +10,7 @@ const routes = require('./routes')
 const xml = require('jsontoxml')
 const bodyParser = require('body-parser')
 const bookingsRouter = require("./Routers/bookingsRouter")
+const Form = require("./Forms/Form")
 
 app.use(bodyParser.json());// post request body parser
 
@@ -85,6 +86,7 @@ app.all('*', function (req, res, next) {
                 }
                 delete response.self
             }
+
             // if(key === "value" && typeof Array.isArray(value)){
             //     value.forEach(element => {
             //         for(let [key, value] of Object.entries(element)){
@@ -102,9 +104,20 @@ app.all('*', function (req, res, next) {
             //         }
             //     });
             //}
+        }
+        const isCollection = Reflect.has(response, "rel") ? response.rel[0] === "collection" : false
+        if(isCollection){
+            response.value.forEach(function(value, i){
+                const hasForm = Reflect.has(value, "$form")
+                if(hasForm){
+                    rewriteForm(value, req)
+                }
+            })
+        }
 
-            
-
+        const hasForm = Reflect.has(response, "$form")
+        if(hasForm){
+            rewriteForm(response, req)
         }
     }
 
@@ -121,6 +134,21 @@ app.all('*', function (req, res, next) {
 
 })
 
+
+function rewriteForm(resource, req){
+    const hasForm = Reflect.has(resource, "$form")
+        if(hasForm){
+            console.log(resource.$form)
+            const defined = Reflect.set(resource, resource.$form.name, {
+                rel : resource.$form.rel,
+                href : `${req.protocol}://${req.hostname}:5000`.concat(resource.$form.href),
+                method : resource.$form.method,
+                value : resource.$form.value
+            })
+            console.log(defined)
+            Reflect.deleteProperty(resource, "$form")
+        }
+}
 
 
 

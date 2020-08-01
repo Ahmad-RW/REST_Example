@@ -1,3 +1,4 @@
+const Form = require("../Forms/Form")
 
 class Collection {
     value = []
@@ -7,6 +8,7 @@ class Collection {
     criteria // sort criteria are allowed fields to sort/filter by
     filterQuery
     allowedOps = ['lt', 'lte', 'gt', 'gte', 'eq', '!eq']
+    $form
     constructor(value, href, rel, sortQuery, filterQuery, criteria ) {
 
         this.value = value
@@ -15,12 +17,12 @@ class Collection {
         this.sortQuery = sortQuery
         this.criteria = criteria
         this.filterQuery = filterQuery
+
     }
 
     sortCollection() {
         //tokens should look like this [rate, desc] or something like that where the [0] is field and [1] is criteria. desc or asc.
         console.log("sorting collection")
-
         //handle if client tries to sort unquerable endpoint
         if (this.criteria.length === 0 && this.sortQuery !== undefined) {
             throw { msg: 'unquerable endpoint', code: 400 }
@@ -77,9 +79,10 @@ class Collection {
     }
 
     filterCollection() {
+        console.log("in filter query")
         //it won't get called if below statement is true however just as a fallback I added it.
         if (this.filterQuery === undefined || this.filterQuery === null) {
-            console.log("sort query failed sanity check")
+            console.log("filter query failed sanity check")
             return
         }
 
@@ -104,8 +107,10 @@ class Collection {
             throw { msg: 'syntax error. extra spaces', code: 400 }
         }
 
+        console.log(tokens)
         //I decided to be strict in terms of checking the filter and sort queries to avoid loop holes.
         if (tokens.length != 3) {
+    
             throw { msg: 'invalid filter syntax', code: 400 }
 
         }
@@ -165,6 +170,7 @@ class Collection {
                 href: this.href,
                 rel: [this.rel],
             },
+            $form : this.$form,
             value: this.value
         }
 

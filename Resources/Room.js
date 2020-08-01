@@ -1,3 +1,4 @@
+const Form = require("../Forms/Form")
 
 class Room {
     roomId = ""
@@ -5,14 +6,30 @@ class Room {
     floor = ""
     executive = null 
     href = {}
-    book = {}
-    constructor(roomId, size, floor, executive, href, bookingForm) {
+    $form = {}
+    constructor(roomId, size, floor, executive, href) {
         this.roomId = roomId
         this.size = size
         this.floor = floor
         this.executive = executive
         this.href = href
-        this.book = bookingForm
+        //this.book = bookingForm
+
+
+        //attaching form
+        this.$form = new Form(["create-form"], `/rooms/${roomId}/bookings`, "POST", 
+        [{
+            name : "startAt",
+            label : "Booking start time",
+            required : true,
+            type : "datetime"
+        },
+        {
+            name : "endAt",
+            label : "Booking end time",
+            required : true,
+            type : "datetime"
+        }], "book")
     }
 
 
