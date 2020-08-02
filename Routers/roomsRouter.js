@@ -29,7 +29,7 @@ roomsRouter.get('/',function(req, res, next){
     const roomsArray = []
     result.forEach(value =>{
      
-        const room = new Room(value.number, value.size, value.floor, value.executive, `${req.protocol}://${req.hostname}:5000/rooms/room/${value.number}`)
+        const room = new Room(value.number, value.size, value.floor, value.executive, `${req.protocol}://${req.hostname}:5000/rooms/${value.number}`)
        
         roomsArray.push(room)
     })
@@ -73,7 +73,7 @@ roomsRouter.get('/:roomId', function(req, res, next){
         res.status(404).send()
         return
     }
-    const roomResource = new Room(result.number, result.size, result.floor, result.executive, getAbsoluteURL(req))
+    const roomResource = new Room(result.number, result.size, result.floor, result.executive ,req.protocol + '://' + req.get('host') + req.originalUrl)
 
     console.log(typeof roomResource)
     res.status(200)
@@ -101,7 +101,7 @@ roomsRouter.get('/openings', function(req, res, next){
 
     const openings = []
     rooms.forEach(function(value){
-        if(value.available) openings.push(new RoomOpenings({href : `${req.protocol}://${req.hostname}:5000/rooms/room/${value.number}`}, moment(), moment().add(2, 'days'), rate.value  )) 
+        if(value.available) openings.push(new RoomOpenings({href : `${req.protocol}://${req.hostname}:5000/rooms/${value.number}`}, moment(), moment().add(2, 'days'), rate.value  )) 
     })
     
     let response
