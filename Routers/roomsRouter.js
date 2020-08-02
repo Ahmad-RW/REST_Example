@@ -64,14 +64,10 @@ roomsRouter.get('/',function(req, res, next){
 })
 
 
-
-//(\d+) regex to match number.
-roomsRouter.get('/room/:roomId', function(req, res, next){
+roomsRouter.get('/:roomId', function(req, res, next){
     console.log("in get room")
     var roomId = req.params.roomId
     
-
-
     let result = roomService.getRoom(roomId)
     if(result === null){
         res.status(404).send()
