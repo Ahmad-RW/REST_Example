@@ -1,4 +1,4 @@
-const Form = require("../Forms/Form")
+const Form = require("./Form")
 
 class Collection {
     value = []

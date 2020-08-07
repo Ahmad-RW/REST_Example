@@ -1,4 +1,4 @@
-const Form = require("../Forms/Form")
+const Form = require("./Form")
 
 class Room {
     roomId = ""
@@ -16,7 +16,7 @@ class Room {
         //this.book = bookingForm
 
 
-        //attaching form
+        //attaching booking form
         this.$form = new Form(["create-form"], `/rooms/${roomId}/bookings`, "POST", 
         [{
             name : "startAt",

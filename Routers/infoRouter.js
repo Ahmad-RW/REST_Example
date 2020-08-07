@@ -1,6 +1,6 @@
 const express = require('express')
 const info = express()
-const jsonInfo   = require('../Resources/Info.json')
+const jsonInfo   = require('../Models/Info.json')
 const {getAbsoluteURL} = require('../getAbsoluteURL')
 // const Resource = require('../Resources/Resource')
 // info.get("/", function(req, res, next){

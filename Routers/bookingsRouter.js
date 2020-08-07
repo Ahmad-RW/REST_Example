@@ -1,11 +1,11 @@
 const express = require('express')
 const bookingsRouter = express()
 
-const Room = require('../Resources/Room')
+const Room = require('../Models/Room')
 const roomService = require('../Services/roomService')
 const confiService  = require('../Services/configService')
 const {getAbsoluteURL} = require('../getAbsoluteURL')
-const Collection = require('../Resources/Collection')
+const Collection = require('../Models/Collection')
 const PaginationOptions = require('../Models/PaginationOptions')
 const RoomOpenings = require('../Models/RoomOpenings')
 const moment = require('moment')

@@ -10,7 +10,7 @@ const routes = require('./routes')
 const xml = require('jsontoxml')
 const bodyParser = require('body-parser')
 const bookingsRouter = require("./Routers/bookingsRouter")
-const Form = require("./Forms/Form")
+const Form = require("./Models/Form")
 
 app.use(bodyParser.json());// post request body parser
 
@@ -33,14 +33,15 @@ app.use("/info", infoRouter)
 
 app.get("/", function (req, res, next) {
     var response = {
-        self: {
-            href: getAbsoluteURL(req),
-        },
+        // self: {
+        //     href: getAbsoluteURL(req),
+        // },
+        href: req.protocol + '://' + req.get('host') + req.originalUrl,
         rooms: {
-            href: `${getAbsoluteURL(req)}rooms${routes.getRooms}`
+            href: `${req.protocol + '://' + req.get('host') + req.originalUrl}rooms/`
         },
         info: {
-            href: `${getAbsoluteURL(req)}info/`
+            href: `${req.protocol + '://' + req.get('host') + req.originalUrl}info/`
         }
     }
 
@@ -59,64 +60,22 @@ app.all('*', function (req, res, next) {
         return
     }
     let response = res.locals.response
-   
+
     if (response !== undefined && response !== null) {
-        console.log("in")
-        for (let [key, value] of Object.entries(response)) {
 
-            if (key === "href") {
-                const rel = response[key].rel
-                // response[key] = {
-                //     href : value,
-                //     method : req.method,
-                //     rel : [`${rel}`]
-                // }
-                // response[key].setHref(value.href)
-                // response[key].setRel([value.rel])
-                // response[key].setMethod(req.method)
-
-            }
-            if (key === "self") {
-                console.log("unwrapping self link")
-                response = {
-                    href: response[key].href,
-                    rel: response[key].rel,
-                    method: req.method,
-                    ...response
-                }
-                delete response.self
-            }
-
-            // if(key === "value" && typeof Array.isArray(value)){
-            //     value.forEach(element => {
-            //         for(let [key, value] of Object.entries(element)){
-            //             if(key === "href"){
-            //                 const rel = element[key].rel
-            //                 element[key] = {
-            //                     href : value,
-            //                     method : req.method,
-            //                     rel : [`${rel}`]
-            //                 }
-            //                 // element[key].setHref(value.href)
-            //                 // element[key].setRel([rel])
-            //                 // element[key].setMethod(req.method)
-            //             }
-            //         }
-            //     });
-            //}
-        }
+        
         const isCollection = Reflect.has(response, "rel") ? response.rel[0] === "collection" : false
-        if(isCollection){
-            response.value.forEach(function(value, i){
+        if (isCollection) {
+            response.value.forEach(function (value, i) {
                 const hasForm = Reflect.has(value, "$form")
-                if(hasForm){
+                if (hasForm) {
                     rewriteForm(value, req)
                 }
             })
         }
 
         const hasForm = Reflect.has(response, "$form")
-        if(hasForm){
+        if (hasForm) {
             rewriteForm(response, req)
         }
     }
@@ -135,19 +94,19 @@ app.all('*', function (req, res, next) {
 })
 
 
-function rewriteForm(resource, req){
+function rewriteForm(resource, req) {
     const hasForm = Reflect.has(resource, "$form")
-        if(hasForm){
-            console.log(resource.$form)
-            const defined = Reflect.set(resource, resource.$form.name, {
-                rel : resource.$form.rel,
-                href : `${req.protocol}://${req.hostname}:5000`.concat(resource.$form.href),
-                method : resource.$form.method,
-                value : resource.$form.value
-            })
-            console.log(defined)
-            Reflect.deleteProperty(resource, "$form")
-        }
+    if (hasForm) {
+        console.log(resource.$form)
+        const defined = Reflect.set(resource, resource.$form.name, {
+            rel: resource.$form.rel,
+            href: `${req.protocol}://${req.hostname}:5000`.concat(resource.$form.href),
+            method: resource.$form.method,
+            value: resource.$form.value
+        })
+        console.log(defined)
+        Reflect.deleteProperty(resource, "$form")
+    }
 }
 
 

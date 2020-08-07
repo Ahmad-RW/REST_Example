@@ -6,8 +6,8 @@
 *
 */
 
-const Collection = require('../Resources/Collection')
-const Form = require('../Forms/Form')
+const Collection = require('./Collection')
+const Form = require('./Form')
 class PagedCollection extends Collection {
     offset
     size
@@ -54,7 +54,7 @@ class PagedCollection extends Collection {
         }
 
         this.$form = new Form(
-            ["query-form"], this.href, "GET",
+            ["query-form"], "", "GET",
             formValue
             , "collectionQuery")
 
