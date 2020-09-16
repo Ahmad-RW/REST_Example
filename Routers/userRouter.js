@@ -68,13 +68,9 @@ userRouter.post("/", function(req, res, next){
 		}
 	res.status(201)
 
-	//add link to in location
-	
-	res.header("location", `${req.protocol}://${req.hostname}:5000/user/${result.$loki}`)
-	
+	res.header("location", `${req.protocol}://${req.hostname}:5000/user/userInfo`)
 	next()
 		
-
 
 })
 
