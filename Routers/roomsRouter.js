@@ -13,6 +13,7 @@ const PagedCollection = require('../Models/PagedCollection')
 const configServices = require('../Services/configService')
 const bookingService = require('../Services/bookingService')
 const Form = require('../Models/Form')
+const Link = require('../Models/Link')
 // GET rooms/{roomId}
 
 
@@ -24,39 +25,39 @@ roomsRouter.get('/',function(req, res, next){
     const limit  = parseInt(req.query.limit) || 5
     const sortQuery = req.query.sortQuery
     const filterQuery = req.query.filterQuery 
-    console.log(filterQuery)
-    let result = roomService.getAllRooms()
+    
+	let result = roomService.getAllRooms()
     const roomsArray = []
     result.forEach(value =>{
-     
-        const room = new Room(value.number, value.size, value.floor, value.executive, `${req.protocol}://${req.hostname}:5000/rooms/${value.number}`)
+    
+        let link = new Link(`${req.protocol}://${req.hostname}:5000/rooms/${value.number}`, undefined, undefined, undefined)
+        const room = new Room(value.number, value.size, value.floor, value.executive, link )
        
         roomsArray.push(room)
     })
-    console.log(filterQuery)
 
     let response;
     try {
-     response = new PagedCollection(offset, roomsArray.length , limit, roomsArray, `${req.protocol}://${req.hostname}:5000/rooms/`,
+        const link = new Link(`${req.protocol}://${req.hostname}:5000/rooms/`, "collection" )
+     response = new PagedCollection(offset, roomsArray.length , limit, roomsArray, link,
       "collection", sortQuery, filterQuery, ["roomId", "size", "executive"]).applyPagination().getResponse()
         
     } catch (error) {
-
         console.log(error)
         res.status(error.code)
-        res.locals = error.msg
+        res.locals.response = {error : error.msg}
         next()
         return
     }
     res.status(200)
     //internally save the response and then send it at the last middleware(check index.js)
+    const toOpenings = new Link(`${req.protocol}://${req.hostname}:5000/rooms/openings`, "collection", "GET", "openings")
     response = {
         ...response,
-        "openings" : {
-            href : `${req.protocol}://${req.hostname}:5000/rooms/`,
-            rel : ["collection"]
-        }
+        toOpenings
     }
+
+    
     res.locals.response = response
     next()
     
@@ -73,9 +74,10 @@ roomsRouter.get('/:roomId', function(req, res, next){
         res.status(404).send()
         return
     }
-    const roomResource = new Room(result.number, result.size, result.floor, result.executive ,req.protocol + '://' + req.get('host') + req.originalUrl)
+    let link = new Link(`${req.protocol}://${req.hostname}:5000/rooms/${result.number}`, undefined, undefined, undefined)
+        const roomResource = new Room(result.number, result.size, result.floor, result.executive, link )
+   // const roomResource = new Room(result.number, result.size, result.floor, result.executive ,req.protocol + '://' + req.get('host') + req.originalUrl)
 
-    console.log(typeof roomResource)
     res.status(200)
     res.locals.response = roomResource
     next()
@@ -111,7 +113,7 @@ roomsRouter.get('/openings', function(req, res, next){
 
     } catch (error) {
        console.log(error)
-       res.locals = error
+       res.locals.response = {error : "some error occurred, please report to admins"} 
        res.status(500)
        next()
        return 
@@ -133,14 +135,14 @@ roomsRouter.post('/:roomId/bookings', function(req, res, next){
 
     if(req.body.startAt === undefined ){
         res.status(400)
-        res.locals.response = {msg : "startAt field is missing"}
+        res.locals.response = {error : "startAt field is missing"}
         next()
         return
     }
     
     if(req.body.endAt === undefined ){
         res.status(400)
-        res.locals.response = {msg : "endAt field is missing"}
+        res.locals.response = {error : "endAt field is missing"}
         next()
         return
     }
@@ -152,14 +154,14 @@ roomsRouter.post('/:roomId/bookings', function(req, res, next){
 
     if(!startAt.isValid() || !endAt.isValid()){
         res.status(400)
-        res.locals = {msg : "Invalid date format"}
+        res.locals.response = {error : "Invalid date format"}
         next()
         return
     }
 
     if(room === null) {
         res.status(404)
-        res.locals.response = {msg : "Room does not exist"}
+        res.locals.response = {error : "Room does not exist"}
         next()
         return
     }
@@ -169,14 +171,14 @@ roomsRouter.post('/:roomId/bookings', function(req, res, next){
 
     if(tooShort){
         res.status(400)
-        res.locals.response = {msg : "Duration of Stay is less than minimum stay period "}
+        res.locals.response = {error : "Duration of Stay is less than minimum stay period "}
         next()
         return
     }
     console.log(startAt)
     if(roomService.getConfilctedSlots(startAt, endAt, roomId)){
         res.status(400)
-        res.locals.response = { msg : "Room Already booked"}
+        res.locals.response = {error : "Room Already booked"}
         next()
         return
     }
@@ -186,7 +188,7 @@ roomsRouter.post('/:roomId/bookings', function(req, res, next){
 
     if(booking === null){
         res.status(400)
-        res.locals.response = { msg : "Invalid Operation"}
+        res.locals.response = { error : "Invalid Operation"}
         next()
         return
     }

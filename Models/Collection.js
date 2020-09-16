@@ -1,18 +1,19 @@
 const Form = require("./Form")
+const Link = require("./Link")
 
 class Collection {
     value = []
-    href
+    link
     ref
     sortQuery
     criteria // sort criteria are allowed fields to sort/filter by
     filterQuery
     allowedOps = ['lt', 'lte', 'gt', 'gte', 'eq', '!eq']
     $form
-    constructor(value, href, rel, sortQuery, filterQuery, criteria ) {
+    constructor(value, link, rel, sortQuery, filterQuery, criteria ) {
 
         this.value = value
-        this.href = href
+        this.link = link
         this.rel = rel
         this.sortQuery = sortQuery
         this.criteria = criteria
@@ -39,7 +40,7 @@ class Collection {
 
         const field = tokens[0]
         const criteria = tokens[1]
-
+	
         if (tokens.length != 2) {
             throw { msg: 'invalid sort syntax', code: 400 }
 
@@ -48,7 +49,7 @@ class Collection {
 
         //test if field exists in collection or not
         if (!this.criteria.includes(field)) {
-            throw { msg: 'invalid sort syntax', code: 400 }
+            throw { msg: 'invalid sort criteria', code: 400 }
         }
 
         const compareFunction = function (a, b, criteria, field) {
@@ -166,43 +167,31 @@ class Collection {
     getResponse() {
      
         let response = {
-            self: {
-                href: this.href,
-                rel: [this.rel],
-            },
+            link : this.link,
             $form : this.$form,
-            value: this.value
+            value : this.value
         }
-
         //if the collection is a paged one. apply first, next, prev, last endpoints of the paged collection. ideal for application who only want to retreive for example 5 rooms per page
         if (this.constructor.name === "PagedCollection") {
+            const toFirst = new Link(this.link.href, this.link.rel, "GET", "first")
+            const toLast = new Link( `${this.link.href}?offset=${this.next}&limit=${this.limit}`, this.link.rel, "GET", "last")
             response = {
                 ...response,
-                first: {
-                    href: this.href,
-                    rel: [this.rel]
-                },
-                last: {
-                    href: `${this.href}?offset=${this.size}&limit=${this.size}`,
-                    rel: [this.rel]
-                }
+                toFirst,
+                toLast
             }
             if (this.next != 0) {
+                const toNext = new Link(`${this.link.href}?offset=${this.next}&limit=${this.limit}`, this.link.rel, "GET", "next")
                 response = {
                     ...response,
-                    next: {
-                        href: `${this.href}?offset=${this.next}&limit=${this.limit}`,
-                        rel: [this.rel]
-                    }
+                    toNext
                 }
             }
             if (this.prev != 0) {
+                const toPrev = new Link(`${this.link.href}?offset=${this.prev}&limit=${this.limit}`, "collection", "GET", "previous")
                 response = {
                     ...response,
-                    previous: {
-                        href: `${this.href}?offset=${this.prev}&limit=${this.limit}`,
-                        rel: [this.rel]
-                    }
+                    toPrev  
                 }
             }
 

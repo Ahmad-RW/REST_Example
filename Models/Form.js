@@ -1,15 +1,11 @@
 //class to represent forms meta-data
 class Form {
-    rel = []
-    href = ""
-    method = ""
-    value = []
+    link = {}
+	value = []
     name = ""
-    constructor(rel, href, method, value, name) {
-        this.rel = rel
-        this.method = method
-        this.value = value
-        this.href = href
+    constructor(link, value, name) {
+        this.link = link
+	    this.value = value
         this.name = name
     }
     

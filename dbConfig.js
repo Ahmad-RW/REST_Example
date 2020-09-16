@@ -1,11 +1,12 @@
 const loki = require('lokijs')
 let db = new loki("inMemoryHotel")
-
+const User = require("./Models/UserEntity.js")
 
 const rooms = db.addCollection("rooms")
 const ballRooms = db.addCollection("ballRooms")
 const config = db.addCollection("config")
 const bookings = db.addCollection("bookings")
+const users    = db.addCollection("users")
 console.log("populating database now")
 //populate rooms start
 rooms.insert({
@@ -133,7 +134,13 @@ ballRooms.insert({
 
 })
 
+//populating users.
 
+const adminUser = new User("User1", "Admin", "tester", new Date(), "ADMIN", "123123")
+const testUser = new User("User2", "Test", "tester", new Date(), "USER", "123456")
+
+users.insert(adminUser)
+users.insert(testUser)
 config.insert({
     key : "MIN_STAY",
     value : 172800000 //ms in days
@@ -144,15 +151,12 @@ config.insert({
     value : 250 //ms in days
 })
 
-// bookings.insert({
-//     roomId : 1,
-//     startAt : "10/10/2010",
-//     endAt : "15/10/2010"
-// })
+
 
 module.exports = {
     rooms,
     ballRooms,
     config,
-    bookings
+    bookings,
+	users
 };

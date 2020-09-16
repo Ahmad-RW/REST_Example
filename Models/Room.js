@@ -1,23 +1,23 @@
 const Form = require("./Form")
-
+const Link = require('./Link')
 class Room {
-    roomId = ""
-    size = ""
-    floor = ""
-    executive = null 
-    href = {}
-    $form = {}
-    constructor(roomId, size, floor, executive, href) {
+    roomId
+    size 
+    floor 
+    executive 
+    link
+    $form
+    constructor(roomId, size, floor, executive, link) {
         this.roomId = roomId
         this.size = size
         this.floor = floor
         this.executive = executive
-        this.href = href
-        //this.book = bookingForm
+        this.link = link
 
 
         //attaching booking form
-        this.$form = new Form(["create-form"], `/rooms/${roomId}/bookings`, "POST", 
+	   const linktoForm = new Link( `${this.link.href}/bookings`, "create-form", "POST", undefined)
+        this.$form = new Form(linktoForm, 
         [{
             name : "startAt",
             label : "Booking start time",
